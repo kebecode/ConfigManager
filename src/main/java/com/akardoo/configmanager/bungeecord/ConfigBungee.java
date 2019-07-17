@@ -22,12 +22,12 @@
  * SOFTWARE.
  */
 
-package com.akardoo.configmanager.spigot;
+package com.akardoo.configmanager.bungeecord;
 
 import com.akardoo.configmanager.api.CustomConfig;
-import lombok.Getter;
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
+import net.md_5.bungee.config.Configuration;
+import net.md_5.bungee.config.ConfigurationProvider;
+import net.md_5.bungee.config.YamlConfiguration;
 
 import java.io.File;
 import java.io.IOException;
@@ -37,23 +37,22 @@ import java.util.List;
 /**
  * @author Kevin (CookLoco)
  */
-@Getter
-public class ConfigBukkit extends CustomConfig {
+public class ConfigBungee extends CustomConfig {
 
-    private FileConfiguration config;
+    Configuration config;
 
-    public ConfigBukkit(File file) {
+    public ConfigBungee(File file) {
         super(file);
     }
 
-    public FileConfiguration getConfig() {
+    public Configuration getConfig() {
         return config;
     }
 
     @Override
     public void save() {
         try {
-            config.save(file);
+            ConfigurationProvider.getProvider(YamlConfiguration.class).save(config, file);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -62,8 +61,11 @@ public class ConfigBukkit extends CustomConfig {
 
     @Override
     public void load() {
-        config = YamlConfiguration.loadConfiguration(file);
-        config.options().header("");
+        try {
+            config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         super.load();
     }
 
@@ -73,61 +75,53 @@ public class ConfigBukkit extends CustomConfig {
     }
 
     @Override
-    public <T> T get(String path, T def) {
-        return (T) config.get(path, def);
+    public <T> Object get(String path, T def) {
+        return config.get(path, def);
     }
 
     @Override
     public boolean contains(String path) {
-        return config.isSet(path);
+        return config.contains(path);
     }
 
     @Override
     public void addDefault(String path, Object defaultValue) {
-        config.addDefault(path, defaultValue);
+        if (!contains(path)) {
+            config.set(path, defaultValue);
+        }
     }
 
     @Override
     public void addDefault(String path, Object defaultValue, String... comments) {
-        super.addDefault(path, defaultValue, comments);
-        config.addDefault(path, defaultValue);
+        if (!contains(path)) {
+            super.addDefault(path, defaultValue, comments);
+            config.set(path, defaultValue);
+        }
     }
 
     @Override
     public Object getDefault(String path) {
-        return config.getDefaults().get(path);
-    }
-
-    @Override
-    public void set(String path, Object value) {
-        super.set(path, value);
-        config.set(path, value);
-    }
-
-    @Override
-    public void set(String path, Object value, String... comments) {
-        super.set(path, value, comments);
-        config.set(path, value);
+        return config.getDefault(path);
     }
 
     @Override
     public Collection<String> getKeys() {
-        return config.getKeys(false);
+        return config.getKeys();
     }
 
     @Override
     public Collection<String> getKeys(boolean deep) {
-        return config.getKeys(deep);
+        return config.getKeys();
     }
 
     @Override
     public byte getByte(String path) {
-        return (byte) config.get(path);
+        return config.getByte(path);
     }
 
     @Override
     public byte getByte(String path, byte def) {
-        return (byte) config.get(path, def);
+        return config.getByte(path, def);
     }
 
     @Override
@@ -137,12 +131,12 @@ public class ConfigBukkit extends CustomConfig {
 
     @Override
     public short getShort(String path) {
-        return (short) config.get(path);
+        return config.getShort(path);
     }
 
     @Override
     public short getShort(String path, short def) {
-        return (short) config.get(path, def);
+        return config.getShort(path, def);
     }
 
     @Override
@@ -162,7 +156,7 @@ public class ConfigBukkit extends CustomConfig {
 
     @Override
     public List<Integer> getIntList(String path) {
-        return config.getIntegerList(path);
+        return config.getIntList(path);
     }
 
     @Override
@@ -172,7 +166,7 @@ public class ConfigBukkit extends CustomConfig {
 
     @Override
     public long getLong(String path, long def) {
-        return config.getLong(path, def);
+        return config.getLong(path);
     }
 
     @Override
@@ -182,12 +176,12 @@ public class ConfigBukkit extends CustomConfig {
 
     @Override
     public float getFloat(String path) {
-        return (float) config.get(path);
+        return config.getFloat(path);
     }
 
     @Override
     public float getFloat(String path, float def) {
-        return (float) config.get(path, def);
+        return config.getFloat(path, def);
     }
 
     @Override
@@ -227,17 +221,17 @@ public class ConfigBukkit extends CustomConfig {
 
     @Override
     public char getChar(String path) {
-        return (char) config.get(path);
+        return config.getChar(path);
     }
 
     @Override
     public char getChar(String path, char def) {
-        return (char) config.get(path, def);
+        return config.getChar(path, def);
     }
 
     @Override
     public List<Character> getCharList(String path) {
-        return config.getCharacterList(path);
+        return config.getCharList(path);
     }
 
     @Override

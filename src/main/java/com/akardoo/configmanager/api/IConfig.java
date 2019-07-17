@@ -32,17 +32,25 @@ import java.util.List;
  */
 public interface IConfig {
 
-    <T> T get(String path, T def);
+    Object get(String path);
+
+    <T> Object get(String path, T def);
 
     boolean contains(String path);
 
-    Object get(String path);
+    void addDefault(String path, Object defaultValue);
+
+    void addDefault(String path, Object defaultValue, String... comments);
 
     Object getDefault(String path);
 
     void set(String path, Object value);
 
+    void set(String path, Object value, String... comments);
+
     //getSection?
+
+    List<String> getComments(String path);
 
     Collection<String> getKeys();
 
@@ -56,7 +64,7 @@ public interface IConfig {
 
     short getShort(String path);
 
-    short getSHort(String path, short def);
+    short getShort(String path, short def);
 
     List<Short> getShortList(String path);
 
