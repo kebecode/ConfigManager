@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.akardoo.configmanager.api;
+package io.github.cookloco.configmanager.api;
 
 import java.util.Collection;
 import java.util.List;

@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.akardoo.configmanager.spigot;
+package io.github.cookloco.configmanager.spigot;
 
-import com.akardoo.configmanager.api.CustomConfig;
+import io.github.cookloco.configmanager.api.CustomConfig;
 import lombok.Getter;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -63,8 +63,9 @@ public class ConfigBukkit extends CustomConfig {
     @Override
     public void load() {
         config = YamlConfiguration.loadConfiguration(file);
-        config.options().header("");
-        super.load();
+        //config.options().header("");
+        config.options().copyDefaults(true);
+        //super.load();
     }
 
     @Override

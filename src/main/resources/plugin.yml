@@ -1,0 +1,4 @@
+name: ConfigManager
+main: io.github.cookloco.configmanager.ConfigManager
+version: 1.0
+author: CookLoco

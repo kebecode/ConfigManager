@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-package com.akardoo.configmanager.api;
+package io.github.cookloco.configmanager.api;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -41,10 +41,9 @@ public abstract class CustomConfig implements IConfig {
     protected File file;
     protected Map<String, List<String>> comments = new LinkedHashMap<>();
     @Setter
-    protected boolean newLinePerKey = false;
+    private boolean newLinePerKey = false;
 
     protected CustomConfig(@NotNull File file) {
-        Validate.notNull(file, "Configuration file can not be null");
         this.file = file;
         load();
     }
@@ -61,9 +60,13 @@ public abstract class CustomConfig implements IConfig {
             for (int lineIndex = 0; lineIndex < configContent.size(); lineIndex++) {
                 String configLine = configContent.get(lineIndex);
 
+                //Check if is a config key
                 String configKey = null;
-                if (!configLine.startsWith("#") && configLine.contains(":"))
-                    configKey = getPathToKey(configContent, lineIndex, configLine);
+                if (!configLine.startsWith("#") && configLine.contains(":")) {
+                    configKey = getPathToKey(configContent, lineIndex, configLine).replaceAll("'", "");
+                }
+
+                //If is a config key, check if has comments to be added
                 if (configKey != null && this.comments.containsKey(configKey)) {
                     int numOfSpaces = getPrefixSpaceCount(configLine);
                     StringBuilder spacePrefix = new StringBuilder();
@@ -72,6 +75,7 @@ public abstract class CustomConfig implements IConfig {
                     }
                     List<String> configComments = this.comments.get(configKey);
 
+                    //First: add comments
                     if (configComments != null) {
                         for (String comment : configComments) {
                             configWriter.append(spacePrefix.toString()).append("# ").append(comment);
@@ -80,19 +84,27 @@ public abstract class CustomConfig implements IConfig {
                     }
                 }
 
-                boolean isComment = configLine.startsWith("#");
+                //Second: add the key with the value
+                if (configKey != null){
+                    configWriter.append(configLine);
+                    configWriter.newLine();
+                }
 
+                //Check if is a List and build the structure
                 if (configLine.startsWith("-") || configLine.startsWith("  -") || configLine.startsWith("    -") || configLine.startsWith("      -")) {
                     configWriter.append("  ").append(configLine);
-                } else {
-                    configWriter.append(configLine);
+                    configWriter.newLine();
                 }
-                configWriter.newLine();
 
+                boolean isComment = configLine.startsWith("#");
+
+                //Check if should add new blank line after a primary section key
                 if (newLinePerKey && lineIndex < configContent.size() - 1 && !isComment) {
                     String nextConfigLine = configContent.get(lineIndex + 1);
                     if (nextConfigLine != null && !nextConfigLine.startsWith(" ")) {
-                        if (!nextConfigLine.startsWith("'") && !nextConfigLine.startsWith("-")) configWriter.newLine();
+                        if (!nextConfigLine.startsWith("'") && !nextConfigLine.startsWith("-")) {
+                            configWriter.newLine();
+                        }
                     }
                 }
             }
@@ -101,6 +113,7 @@ public abstract class CustomConfig implements IConfig {
         }
     }
 
+    @Deprecated
     protected void load() {
         List<String> configLines = getConfigContent();
 
@@ -167,7 +180,7 @@ public abstract class CustomConfig implements IConfig {
         return comments.containsKey(path) ? new ArrayList<>(comments.get(path)) : new ArrayList<>();
     }
 
-    private void putComments(String path, String... comments) {
+    public void putComments(String path, String... comments) {
         List<String> commentsList = new ArrayList<>();
         for (String comment : comments) {
             if (comment != null) {

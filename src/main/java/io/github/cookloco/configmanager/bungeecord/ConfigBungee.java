@@ -22,9 +22,9 @@
  * SOFTWARE.
  */
 
-package com.akardoo.configmanager.bungeecord;
+package io.github.cookloco.configmanager.bungeecord;
 
-import com.akardoo.configmanager.api.CustomConfig;
+import io.github.cookloco.configmanager.api.CustomConfig;
 import net.md_5.bungee.config.Configuration;
 import net.md_5.bungee.config.ConfigurationProvider;
 import net.md_5.bungee.config.YamlConfiguration;
@@ -61,6 +61,17 @@ public class ConfigBungee extends CustomConfig {
 
     @Override
     public void load() {
+        File parent = file.getParentFile();
+        if (!parent.exists()) {
+            parent.mkdirs();
+        }
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
         try {
             config = ConfigurationProvider.getProvider(YamlConfiguration.class).load(file);
         } catch (IOException e) {

@@ -22,11 +22,40 @@
  * SOFTWARE.
  */
 
-package com.akardoo.configmanager;
+package io.github.cookloco.configmanager;
+
+import io.github.cookloco.configmanager.api.CustomConfig;
+import io.github.cookloco.configmanager.bungeecord.ConfigBungee;
+import net.md_5.bungee.api.plugin.Plugin;
+
+import java.io.File;
 
 /**
  * @author Kevin (CookLoco)
  */
-public class ConfigManager {
+public class ConfigManagerBungee extends Plugin {
 
+    @Override
+    public void onEnable() {
+
+        File file = new File(this.getDataFolder(), "config.yml");
+        CustomConfig config = new ConfigBungee(file);
+
+
+        config.addDefault("test.1", 10, "This is a test comment");
+        config.addDefault("test.test", 12, "This is the second test");
+        config.addDefault("prueba.hola", true, "This a prueba", "hola");
+        config.addDefault("prueba.adios", "adios");
+        config.putComments("prueba", "Comentario en prueba");
+        config.putComments("test", "Comentario en test");
+
+        config.setNewLinePerKey(true);
+
+        config.save();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
 }
